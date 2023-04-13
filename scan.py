@@ -1,11 +1,11 @@
 import components.misc as misc
-import components.scanner as scanner
+import components.net as net
 
 while True:
 
     while True:
         host = input("Nom d'hôte ou adresse IP pour le scan: ")
-        if scanner.ping(host): 
+        if net.ping(host): 
             break
         if misc.prompt_yes_no("L'hôte semble ne pas être joignable, voulez-vous malgré tout poursuivre ?"): 
             break
@@ -23,12 +23,13 @@ while True:
     is_udp = misc.prompt_yes_no("Voulez-vous faire un scan UDP ?")
     is_parallel = misc.prompt_yes_no("Voulez-vous faire un scan de ports en parallèle ?")
     print()
-    scanner.scan_handler(
+    net.scan_handler(
         host= host,
         port_start= port_start,
         port_end= port_end,
         proto= "UDP" if is_udp else "TCP",
-        parallel_threads= is_parallel
+        parallel_threads= is_parallel,
+        verbose=True
     )
     if not misc.prompt_yes_no("Voulez refaire un scan ?"):
         break
