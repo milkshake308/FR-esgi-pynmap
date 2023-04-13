@@ -34,7 +34,7 @@ def filter_with_services(service_file ,df_report, skip_closed_ports=True):
     except pa.errors.ParserError as e:
         print("Erreur de parsing du fichier CSV, vérifiez le format du fichier", e)
     except FileNotFoundError as e:
-        print("Le fichier n'a pas été trouvé, vérifiez le chemin d'accès du fichier et le contexte d'éxécution du programme", e)
+        print("Le fichier de services.csv n'a pas été trouvé, \n Vérifiez qu'un fichier services.csv avec les colonnes Port, Protocol, Description existe (sensible a la casse)", e)
     except Exception as e:
         print("Impossible de lire le fichier",e)
 
