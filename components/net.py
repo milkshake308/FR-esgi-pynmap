@@ -2,18 +2,23 @@ import socket, subprocess, threading, platform
 from datetime import datetime
 
 def check_port(host: str, port: int, proto: str, timeout: int):
+    
+
     try:
+        ip = socket.gethostbyname(host)
         sock = socket.socket(
                             socket.AF_INET, 
                             socket.SOCK_DGRAM if proto.upper()=='UDP' else socket.SOCK_STREAM
                             )
         sock.settimeout(timeout)
-        if sock.connect_ex((host, port)) == 0:
+        if sock.connect_ex((ip, port)) == 0:
             sock.close()
             return True
         else:
             sock.close()
             return False
+
+
     
     except socket.error:
         pass
@@ -25,8 +30,7 @@ def timestamp_line(*args):
 def save_file(lines: list, filename: str):
     with open(filename, 'w') as f:
         for line in lines:
-            f.write("%s\n" % line)
-
+            f.write(f"{line}\n")
 
 def ping(host :str):
     print("Ping en cours...", end=' ', flush=True)
@@ -49,7 +53,8 @@ def progressbar(current, total):
     bar = '=' * fill_width + '-' * (bar_width - fill_width)
     print(f'[{bar}] {percent}%\r', end='')
     
-def scan_handler(host: str, port_start: int, port_end: int, report_name="Rapport_de_scan_du_", proto="TCP", parallel_threads=False, socket_timeout=2, verbose=False):
+def scan_handler(host: str, port_start: int, port_end: int, report_name="Rapport_de_scan_de_", proto="TCP", parallel_threads=False, socket_timeout=2, verbose=False):
+    no_progressbar = False
     if port_end is None :
         parallel_threads = False
         no_progressbar = True
@@ -84,7 +89,6 @@ Port de fin : {port_end}\t\t Execution parallèle : {"Désactivé" if not parall
         logs.append(stat)
     elif parallel_threads :
         threads = []
-        results = {}
         step = 10
         for i in range(0, total_ports, step):
             t = threading.Thread(target=scanner_worker, args=(port_start+i, port_start+i+step-1))
@@ -103,7 +107,7 @@ Port de fin : {port_end}\t\t Execution parallèle : {"Désactivé" if not parall
         
 
     logs.append(timestamp_line(f"Temps total d'éxécution du scan : {datetime.now().replace(microsecond=0) - start_time.replace(microsecond=0)}"))
-    report_filename = report_name+datetime.now().strftime('%Y-%m-%d_%H:%M')+".log"
+    report_filename = report_name+host+datetime.now().strftime('%Y-%m-%d_%H-%M')+".log"
     save_file(logs, report_filename)
     if verbose:
         print(f"Rapport généré : {report_filename}")
